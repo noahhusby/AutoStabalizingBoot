@@ -15,9 +15,8 @@ Adafruit_LSM9DS1 lsm = Adafruit_LSM9DS1();
 #define LSM9DS1_XGCS 6
 #define LSM9DS1_MCS 5
 
-#define BUZZER_PIN 10
 #define BUTTON_PIN 5
-#define VESC_PIN 4
+#define VESC_PIN 10
 
 #define VESC_OUTPUT_MULTIPLIER 1023
 
@@ -40,8 +39,6 @@ void setupSensor()
 
 void setup() 
 {
-  pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT);
   
   Serial.begin(115200);
 
@@ -107,9 +104,6 @@ void loop()
     if(engageSystem){
       engageSystem = false;
       pidOut = 0.0;
-      beep(100);
-      beep(100);
-      beep(100);
       Serial.println("[Error] Maximum Distance Fault Tripped - System Disabled");
     }
   }
@@ -134,7 +128,7 @@ void loop()
       localCalculatedOut = -1;
     }
 
-    esc.writeMicroseconds(map(VESC_OUTPUT_MULTIPLIER), 0, 1023, 1000, 2000);
+    esc.writeMicroseconds(map(VESC_OUTPUT_MULTIPLIER * localCalculatedOut, 0 , 1023, 1000, 2000));
     
     Serial.print(localCalculatedOut);
     Serial.println( );
@@ -165,10 +159,3 @@ float convertRawGyro(int gRaw) {
   return g;
 }
 
-void beep(int duration) {
-  digitalWrite(BUZZER_PIN, 1);
-  delay(duration);
-  digitalWrite(BUZZER_PIN, 0);
-  delay(duration);
-
-}
